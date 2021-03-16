@@ -116,6 +116,7 @@ public class Server
 
             injector.getInstance(PluginManager.class).loadPlugins();
 
+            // 加载catalog
             injector.getInstance(StaticCatalogStore.class).loadCatalogs();
 
             // TODO: remove this huge hack

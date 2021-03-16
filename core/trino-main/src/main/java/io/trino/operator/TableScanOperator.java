@@ -44,6 +44,9 @@ import static com.google.common.base.Preconditions.checkState;
 import static io.airlift.concurrent.MoreFutures.toListenableFuture;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 获取表中数据的operator
+ */
 public class TableScanOperator
         implements SourceOperator
 {

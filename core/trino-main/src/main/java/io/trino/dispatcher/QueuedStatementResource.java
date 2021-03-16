@@ -90,6 +90,10 @@ import static javax.ws.rs.core.MediaType.TEXT_PLAIN_TYPE;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
+/**
+ * 处理已提交、排队中的查询
+ * 不会返回查询数据，只会返回当前状态
+ */
 @Path("/v1/statement")
 public class QueuedStatementResource
 {
@@ -102,6 +106,9 @@ public class QueuedStatementResource
     private final DispatchManager dispatchManager;
 
     private final Executor responseExecutor;
+    /**
+     * 查询延时进行分发的线程池
+     */
     private final ScheduledExecutorService timeoutExecutor;
 
     private final ConcurrentMap<QueryId, Query> queries = new ConcurrentHashMap<>();
@@ -165,6 +172,14 @@ public class QueuedStatementResource
         queryPurger.shutdownNow();
     }
 
+    /**
+     * 请求查询，主要是返回nextUri供查看状态
+     * @param statement
+     * @param servletRequest
+     * @param httpHeaders
+     * @param uriInfo
+     * @return
+     */
     @ResourceSecurity(AUTHENTICATED_USER)
     @POST
     @Produces(APPLICATION_JSON)
@@ -192,6 +207,15 @@ public class QueuedStatementResource
         return createQueryResultsResponse(query.getQueryResults(query.getLastToken(), uriInfo), compressionEnabled);
     }
 
+    /**
+     * 获取查询状态
+     * @param queryId
+     * @param slug
+     * @param token
+     * @param maxWait
+     * @param uriInfo
+     * @param asyncResponse
+     */
     @ResourceSecurity(PUBLIC)
     @GET
     @Path("queued/{queryId}/{slug}/{token}")
@@ -208,12 +232,13 @@ public class QueuedStatementResource
 
         // wait for query to be dispatched, up to the wait timeout
         ListenableFuture<?> futureStateChange = addTimeout(
+                // 查询[核心]
                 query.waitForDispatched(),
                 () -> null,
                 WAIT_ORDERING.min(MAX_WAIT_TIME, maxWait),
                 timeoutExecutor);
 
-        // when state changes, fetch the next result
+        // when state changes, fetch the next result 结果转换
         ListenableFuture<QueryResults> queryResultsFuture = Futures.transform(
                 futureStateChange,
                 ignored -> query.getQueryResults(token, uriInfo),
@@ -322,8 +347,15 @@ public class QueuedStatementResource
         private final DispatchManager dispatchManager;
         private final QueryId queryId;
         private final Slug slug = Slug.createNew();
+        /**
+         * 一次查询可能分为多个token，
+         * 此为上一个token的id，第一次查询时该值为0
+         */
         private final AtomicLong lastToken = new AtomicLong();
 
+        /**
+         * 查询分发的ListenableFuture
+         */
         @GuardedBy("this")
         private ListenableFuture<?> querySubmissionFuture;
 
@@ -355,6 +387,10 @@ public class QueuedStatementResource
             return querySubmissionFuture != null && querySubmissionFuture.isDone();
         }
 
+        /**
+         * 等待查询分发完成
+         * @return
+         */
         private ListenableFuture<?> waitForDispatched()
         {
             // if query submission has not finished, wait for it to finish
@@ -371,6 +407,12 @@ public class QueuedStatementResource
             return dispatchManager.waitForDispatched(queryId);
         }
 
+        /**
+         * 获取查询结果，因为查询在排队，所以没有数据返回
+         * @param token
+         * @param uriInfo
+         * @return
+         */
         public QueryResults getQueryResults(long token, UriInfo uriInfo)
         {
             long lastToken = this.lastToken.get();
@@ -412,6 +454,13 @@ public class QueuedStatementResource
             sessionContext.getIdentity().destroy();
         }
 
+        /**
+         * 返回查询结果，因为是排队中的查询，所以都没有数据返回？
+         * @param token
+         * @param uriInfo
+         * @param dispatchInfo
+         * @return
+         */
         private QueryResults createQueryResults(long token, UriInfo uriInfo, DispatchInfo dispatchInfo)
         {
             URI nextUri = getNextUri(token, uriInfo, dispatchInfo);

@@ -56,6 +56,9 @@ public class LocalDispatchQueryFactory
 
     private final ClusterSizeMonitor clusterSizeMonitor;
 
+    /**
+     * 不同类型statement对应的不同查询执行器factory
+     */
     private final Map<Class<? extends Statement>, QueryExecutionFactory<?>> executionFactories;
     private final WarningCollectorFactory warningCollectorFactory;
     private final ListeningExecutorService executor;
@@ -126,6 +129,7 @@ public class LocalDispatchQueryFactory
             }
 
             try {
+                // [核心]执行查询
                 return queryExecutionFactory.createQueryExecution(preparedQuery, stateMachine, slug, warningCollector);
             }
             catch (Throwable e) {
@@ -140,6 +144,7 @@ public class LocalDispatchQueryFactory
                 queryMonitor,
                 clusterSizeMonitor,
                 executor,
+                // 查询
                 queryManager::createQuery);
     }
 }

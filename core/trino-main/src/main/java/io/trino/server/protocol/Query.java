@@ -327,7 +327,16 @@ class Query
         return clearTransactionId;
     }
 
-    public synchronized ListenableFuture<QueryResults> waitForResults(long token, UriInfo uriInfo, Duration wait, DataSize targetResultSize)
+    /**
+     * 异步获取查询结果
+     * @param token
+     * @param uriInfo
+     * @param wait
+     * @param targetResultSize
+     * @return
+     */
+    public synchronized ListenableFuture<QueryResults> waitForResults(long token, UriInfo uriInfo, Duration wait,
+                                                                      DataSize targetResultSize)
     {
         // before waiting, check if this request has already been processed and cached
         Optional<QueryResults> cachedResult = getCachedResult(token);
@@ -346,6 +355,10 @@ class Query
         return Futures.transform(futureStateChange, ignored -> getNextResult(token, uriInfo, targetResultSize), resultsProcessorExecutor);
     }
 
+    /**
+     * 获取查询结果
+     * @return
+     */
     private synchronized ListenableFuture<?> getFutureStateChange()
     {
         // if the exchange client is open, wait for data
@@ -396,6 +409,13 @@ class Query
         return Optional.empty();
     }
 
+    /**
+     * 获取查询结果
+     * @param token
+     * @param uriInfo
+     * @param targetResultSize
+     * @return
+     */
     private synchronized QueryResults getNextResult(long token, UriInfo uriInfo, DataSize targetResultSize)
     {
         // check if the result for the token have already been created
@@ -517,6 +537,7 @@ class Query
                     break;
                 }
 
+                // page即为查询结果数据
                 Page page = serde.deserialize(context, serializedPage);
                 bytes += page.getLogicalSizeInBytes();
                 resultBuilder.addPage(page);
@@ -579,6 +600,11 @@ class Query
         }
     }
 
+    /**
+     * 获取查询数据
+     * @param currentState
+     * @return
+     */
     private ListenableFuture<?> queryDoneFuture(QueryState currentState)
     {
         if (currentState.isDone()) {

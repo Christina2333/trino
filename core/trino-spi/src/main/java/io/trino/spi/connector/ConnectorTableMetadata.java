@@ -22,6 +22,9 @@ import java.util.Optional;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 用来表示table相关的元数据，和catalog不关联
+ */
 public class ConnectorTableMetadata
 {
     private final SchemaTableName table;

@@ -58,6 +58,9 @@ import static io.trino.util.StatementUtils.isTransactionControlStatement;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 查询分发器
+ */
 public class DispatchManager
 {
     private final QueryIdGenerator queryIdGenerator;
@@ -72,8 +75,13 @@ public class DispatchManager
 
     private final int maxQueryLength;
 
+    /**
+     * 处理分发的线程池
+     */
     private final Executor dispatchExecutor;
-
+    /**
+     * 记录查询分发
+     */
     private final QueryTracker<DispatchQuery> queryTracker;
 
     private final QueryManagerStats stats = new QueryManagerStats();
@@ -145,6 +153,7 @@ public class DispatchManager
         DispatchQueryCreationFuture queryCreationFuture = new DispatchQueryCreationFuture();
         dispatchExecutor.execute(() -> {
             try {
+                // 查询【核心】
                 createQueryInternal(queryId, slug, sessionContext, query, resourceGroupManager);
             }
             finally {
@@ -155,10 +164,12 @@ public class DispatchManager
     }
 
     /**
-     * Creates and registers a dispatch query with the query tracker.  This method will never fail to register a query with the query
-     * tracker.  If an error occurs while creating a dispatch query, a failed dispatch will be created and registered.
+     * Creates and registers a dispatch query with the query tracker.
+     * This method will never fail to register a query with the query tracker.
+     * If an error occurs while creating a dispatch query, a failed dispatch will be created and registered.
      */
-    private <C> void createQueryInternal(QueryId queryId, Slug slug, SessionContext sessionContext, String query, ResourceGroupManager<C> resourceGroupManager)
+    private <C> void createQueryInternal(QueryId queryId, Slug slug, SessionContext sessionContext, String query,
+                                         ResourceGroupManager<C> resourceGroupManager)
     {
         Session session = null;
         PreparedQuery preparedQuery = null;
@@ -195,6 +206,7 @@ public class DispatchManager
             // mark existing transaction as active
             transactionManager.activateTransaction(session, isTransactionControlStatement(preparedQuery.getStatement()), accessControl);
 
+            // 返回QueryExecution
             DispatchQuery dispatchQuery = dispatchQueryFactory.createDispatchQuery(
                     session,
                     query,
@@ -205,6 +217,11 @@ public class DispatchManager
             boolean queryAdded = queryCreated(dispatchQuery);
             if (queryAdded && !dispatchQuery.isDone()) {
                 try {
+                    /**
+                     * [核心]
+                     * 等待计算资源，此处内部QueryState会变为
+                     * @see io.trino.execution.QueryState#WAITING_FOR_RESOURCES
+                     */
                     resourceGroupManager.submit(dispatchQuery, selectionContext, dispatchExecutor);
                 }
                 catch (Throwable e) {

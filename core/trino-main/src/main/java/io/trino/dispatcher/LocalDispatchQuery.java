@@ -91,6 +91,7 @@ public class LocalDispatchQuery
             }
         });
 
+        // 增加查询状态 状态机的listener
         stateMachine.addStateChangeListener(state -> {
             if (state == QueryState.FAILED) {
                 if (notificationSentOrGuaranteed.compareAndSet(false, true)) {
@@ -104,6 +105,9 @@ public class LocalDispatchQuery
         });
     }
 
+    /**
+     * 等待计算资源
+     */
     @Override
     public void startWaitingForResources()
     {

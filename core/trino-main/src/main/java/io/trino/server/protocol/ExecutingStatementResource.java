@@ -73,6 +73,9 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN_TYPE;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
+/**
+ * 处理执行中的查询
+ */
 @Path("/v1/statement/executing")
 public class ExecutingStatementResource
 {
@@ -138,6 +141,16 @@ public class ExecutingStatementResource
         queryPurger.shutdownNow();
     }
 
+    /**
+     * 获取查询结果
+     * @param queryId
+     * @param slug
+     * @param token
+     * @param maxWait
+     * @param targetResultSize
+     * @param uriInfo
+     * @param asyncResponse
+     */
     @ResourceSecurity(PUBLIC)
     @GET
     @Path("{queryId}/{slug}/{token}")
@@ -155,6 +168,13 @@ public class ExecutingStatementResource
         asyncQueryResults(query, token, maxWait, targetResultSize, uriInfo, asyncResponse);
     }
 
+    /**
+     * 创建查询参数
+     * @param queryId
+     * @param slug
+     * @param token
+     * @return
+     */
     protected Query getQuery(QueryId queryId, String slug, long token)
     {
         Query query = queries.get(queryId);
@@ -171,6 +191,7 @@ public class ExecutingStatementResource
         try {
             session = queryManager.getQuerySession(queryId);
             querySlug = queryManager.getQuerySlug(queryId);
+            // 似乎只支持直接执行查询，107版本只支持排队查询
             if (!querySlug.isValid(EXECUTING_QUERY, slug, token)) {
                 throw badRequest(NOT_FOUND, "Query not found");
             }
@@ -193,6 +214,15 @@ public class ExecutingStatementResource
         return query;
     }
 
+    /**
+     * 异步获取查询结果
+     * @param query
+     * @param token
+     * @param maxWait
+     * @param targetResultSize
+     * @param uriInfo
+     * @param asyncResponse
+     */
     private void asyncQueryResults(
             Query query,
             long token,
@@ -264,6 +294,13 @@ public class ExecutingStatementResource
         return response.build();
     }
 
+    /**
+     * 取消正在执行的查询
+     * @param queryId
+     * @param slug
+     * @param token
+     * @return
+     */
     @ResourceSecurity(PUBLIC)
     @DELETE
     @Path("{queryId}/{slug}/{token}")
@@ -295,6 +332,13 @@ public class ExecutingStatementResource
         }
     }
 
+    /**
+     * 取消已经部分执行的查询
+     * @param queryId
+     * @param stage
+     * @param slug
+     * @param token
+     */
     @ResourceSecurity(PUBLIC)
     @DELETE
     @Path("partialCancel/{queryId}/{stage}/{slug}/{token}")

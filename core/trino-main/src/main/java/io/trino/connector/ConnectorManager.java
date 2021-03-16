@@ -90,11 +90,23 @@ public class ConnectorManager
     private final MetadataManager metadataManager;
     private final CatalogManager catalogManager;
     private final AccessControlManager accessControlManager;
+    /**
+     * 分片管理器
+     */
     private final SplitManager splitManager;
+    /**
+     * 分页读取
+     */
     private final PageSourceManager pageSourceManager;
+    /**
+     * 获取索引
+     */
     private final IndexManager indexManager;
     private final NodePartitioningManager nodePartitioningManager;
 
+    /**
+     * 分页写入
+     */
     private final PageSinkManager pageSinkManager;
     private final HandleResolver handleResolver;
     private final InternalNodeManager nodeManager;
@@ -175,6 +187,11 @@ public class ConnectorManager
         }
     }
 
+    /**
+     * 增加元数据factory
+     * @param connectorFactory
+     * @param duplicatePluginClassLoaderFactory
+     */
     public synchronized void addConnectorFactory(ConnectorFactory connectorFactory, Supplier<ClassLoader> duplicatePluginClassLoaderFactory)
     {
         requireNonNull(connectorFactory, "connectorFactory is null");
@@ -186,6 +203,13 @@ public class ConnectorManager
         checkArgument(existingConnectorFactory == null, "Connector '%s' is already registered", connectorFactory.getName());
     }
 
+    /**
+     * 创建catalog
+     * @param catalogName
+     * @param connectorName
+     * @param properties
+     * @return
+     */
     public synchronized CatalogName createCatalog(String catalogName, String connectorName, Map<String, String> properties)
     {
         requireNonNull(connectorName, "connectorName is null");
@@ -210,6 +234,12 @@ public class ConnectorManager
         return catalog;
     }
 
+    /**
+     * 创建catalog的核心代码
+     * @param catalogName
+     * @param factory     创建connector的Factory
+     * @param properties  配置信息
+     */
     private synchronized void createCatalog(CatalogName catalogName, InternalConnectorFactory factory, Map<String, String> properties)
     {
         // create all connectors before adding, so a broken connector does not leave the system half updated
@@ -252,6 +282,7 @@ public class ConnectorManager
                 systemConnector.getConnector());
 
         try {
+            // 加载catalog
             addConnectorInternal(connector);
             addConnectorInternal(informationSchemaConnector);
             addConnectorInternal(systemConnector);
@@ -271,6 +302,10 @@ public class ConnectorManager
                 .forEach(eventListenerManager::addEventListener);
     }
 
+    /**
+     * 内部加入connector
+     * @param connector
+     */
     private synchronized void addConnectorInternal(MaterializedConnector connector)
     {
         checkState(!stopped.get(), "ConnectorManager is stopped");
@@ -345,6 +380,13 @@ public class ConnectorManager
         }
     }
 
+    /**
+     * 创建connector
+     * @param catalogName 数据库实例名称
+     * @param factory     创建该connector的connectorFactory
+     * @param properties  *.properties中其他配置
+     * @return
+     */
     private Connector createConnector(CatalogName catalogName, InternalConnectorFactory factory, Map<String, String> properties)
     {
         ConnectorContext context = new ConnectorContextInstance(
@@ -388,19 +430,37 @@ public class ConnectorManager
         }
     }
 
+    /**
+     * 包含Connector的全部内容
+     */
     private static class MaterializedConnector
     {
         private final CatalogName catalogName;
         private final Connector connector;
         private final Set<SystemTable> systemTables;
         private final Set<Procedure> procedures;
+        /**
+         * 用于数据读取的分片管理器
+         */
         private final Optional<ConnectorSplitManager> splitManager;
+        /**
+         * 用于分页读取
+         */
         private final Optional<ConnectorPageSourceProvider> pageSourceProvider;
+        /**
+         * 用于分页写入
+         */
         private final Optional<ConnectorPageSinkProvider> pageSinkProvider;
+        /**
+         * 用于读取索引
+         */
         private final Optional<ConnectorIndexProvider> indexProvider;
         private final Optional<ConnectorNodePartitioningProvider> partitioningProvider;
         private final Optional<ConnectorAccessControl> accessControl;
         private final List<EventListener> eventListeners;
+        /**
+         * 各种属性元数据
+         */
         private final List<PropertyMetadata<?>> sessionProperties;
         private final List<PropertyMetadata<?>> tableProperties;
         private final List<PropertyMetadata<?>> schemaProperties;

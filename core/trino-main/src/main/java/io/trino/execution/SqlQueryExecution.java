@@ -95,6 +95,9 @@ import static io.trino.sql.ParameterUtils.parameterExtractor;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+/**
+ * sql查询执行【核心】
+ */
 @ThreadSafe
 public class SqlQueryExecution
         implements QueryExecution
@@ -103,15 +106,30 @@ public class SqlQueryExecution
 
     private static final OutputBufferId OUTPUT_BUFFER_ID = new OutputBufferId(0);
 
+    /**
+     * 状态机
+     */
     private final QueryStateMachine stateMachine;
     private final Slug slug;
+    /**
+     * 元数据
+     */
     private final Metadata metadata;
     private final TypeOperators typeOperators;
+    /**
+     * 语法词法解析器
+     */
     private final SqlParser sqlParser;
     private final SplitManager splitManager;
     private final NodePartitioningManager nodePartitioningManager;
     private final NodeScheduler nodeScheduler;
+    /**
+     * 执行计划优化规则
+     */
     private final List<PlanOptimizer> planOptimizers;
+    /**
+     * 逻辑执行计划划分
+     */
     private final PlanFragmenter planFragmenter;
     private final RemoteTaskFactory remoteTaskFactory;
     private final int scheduleSplitBatchSize;
@@ -124,6 +142,9 @@ public class SqlQueryExecution
     private final NodeTaskMap nodeTaskMap;
     private final ExecutionPolicy executionPolicy;
     private final SplitSchedulerStats schedulerStats;
+    /**
+     * 解析结果
+     */
     private final Analysis analysis;
     private final StatsCalculator statsCalculator;
     private final CostCalculator costCalculator;
@@ -182,7 +203,7 @@ public class SqlQueryExecution
 
             this.stateMachine = requireNonNull(stateMachine, "stateMachine is null");
 
-            // analyze query
+            // analyze query 语法词法解析
             this.analysis = analyze(preparedQuery, stateMachine, metadata, groupProvider, accessControl, sqlParser, queryExplainer, warningCollector);
 
             stateMachine.addStateChangeListener(state -> {
@@ -236,6 +257,18 @@ public class SqlQueryExecution
         dynamicFilterService.removeQuery(stateMachine.getQueryId());
     }
 
+    /**
+     * 获取解析结果
+     * @param preparedQuery
+     * @param stateMachine
+     * @param metadata
+     * @param groupProvider
+     * @param accessControl
+     * @param sqlParser
+     * @param queryExplainer
+     * @param warningCollector
+     * @return
+     */
     private Analysis analyze(
             PreparedQuery preparedQuery,
             QueryStateMachine stateMachine,
@@ -369,6 +402,10 @@ public class SqlQueryExecution
                 .orElseGet(() -> stateMachine.getBasicQueryInfo(Optional.ofNullable(queryScheduler.get()).map(SqlQueryScheduler::getBasicStageStats)));
     }
 
+    /**
+     * 查询【核心】流程！！！！！
+     * 创建逻辑执行计划及分布式物理执行计划
+     */
     @Override
     public void start()
     {
@@ -394,6 +431,7 @@ public class SqlQueryExecution
                 SqlQueryScheduler scheduler = queryScheduler.get();
 
                 if (!stateMachine.isDone()) {
+                    // 在worker中执行查询操作
                     scheduler.start();
                 }
             }
@@ -754,6 +792,14 @@ public class SqlQueryExecution
             this.dynamicFilterService = requireNonNull(dynamicFilterService, "dynamicFilterService is null");
         }
 
+        /**
+         * 创建queryExecution
+         * @param preparedQuery
+         * @param stateMachine
+         * @param slug
+         * @param warningCollector
+         * @return
+         */
         @Override
         public QueryExecution createQueryExecution(
                 PreparedQuery preparedQuery,

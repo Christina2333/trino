@@ -18,6 +18,9 @@ import io.trino.spi.type.Type;
 
 import java.io.Closeable;
 
+/**
+ * 从第三方存储框架读取数据
+ */
 public interface RecordCursor
         extends Closeable
 {

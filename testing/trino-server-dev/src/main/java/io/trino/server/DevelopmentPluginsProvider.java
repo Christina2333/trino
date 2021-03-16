@@ -74,6 +74,13 @@ public class DevelopmentPluginsProvider
         return buildClassLoaderFromCoordinates(plugin, classLoaderFactory);
     }
 
+    /**
+     * Presto的插件自动发现功能，自动创建了对应的目录和文件
+     * @param pomFile
+     * @param classLoaderFactory
+     * @return
+     * @throws IOException
+     */
     private PluginClassLoader buildClassLoaderFromPom(File pomFile, ClassLoaderFactory classLoaderFactory)
             throws IOException
     {
@@ -81,9 +88,11 @@ public class DevelopmentPluginsProvider
         PluginClassLoader classLoader = createClassLoader(artifacts, classLoaderFactory);
 
         Artifact artifact = artifacts.get(0);
+        // 插件声明的发现
         Set<String> plugins = discoverPlugins(artifact, classLoader);
         if (!plugins.isEmpty()) {
             File root = new File(artifact.getFile().getParentFile().getCanonicalFile(), "plugin-discovery");
+            // 插件声明的写入
             writePluginServices(plugins, root);
             classLoader = classLoader.withUrl(root.toURI().toURL());
         }

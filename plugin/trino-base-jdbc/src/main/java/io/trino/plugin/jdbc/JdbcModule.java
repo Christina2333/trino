@@ -34,6 +34,9 @@ import static com.google.inject.multibindings.OptionalBinder.newOptionalBinder;
 import static io.airlift.configuration.ConfigBinder.configBinder;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * @see io.trino.plugin.jdbc.JdbcConnectorFactory.JdbcModuleProvider
+ */
 public class JdbcModule
         implements Module
 {

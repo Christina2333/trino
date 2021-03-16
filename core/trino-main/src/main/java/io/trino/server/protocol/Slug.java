@@ -20,11 +20,21 @@ import java.security.SecureRandom;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 查询的类型
+ */
 public final class Slug
 {
     public enum Context
     {
+        /**
+         * 排队查询
+         * 0.107版本只有这个
+         */
         QUEUED_QUERY,
+        /**
+         * 直接执行查询
+         */
         EXECUTING_QUERY,
     }
 

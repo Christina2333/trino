@@ -20,15 +20,25 @@ import static com.google.common.base.MoreObjects.toStringHelper;
 import static io.trino.metadata.MetadataUtil.checkCatalogName;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 数据库实例
+ */
 public class Catalog
 {
     private final String catalogName;
     private final CatalogName connectorCatalogName;
     private final Connector connector;
 
+    /**
+     * 数据源的元数据信息
+     * 例如：mysql中的information_schema中存储数据库及表名等信息
+     */
     private final CatalogName informationSchemaId;
     private final Connector informationSchema;
 
+    /**
+     * 不是每种数据源都存在
+     */
     private final CatalogName systemTablesId;
     private final Connector systemTables;
 

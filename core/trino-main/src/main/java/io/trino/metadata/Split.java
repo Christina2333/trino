@@ -70,6 +70,10 @@ public final class Split
         return connectorSplit.getAddresses();
     }
 
+    /**
+     * 是否需要被分配到指定节点上
+     * @return
+     */
     public boolean isRemotelyAccessible()
     {
         return connectorSplit.isRemotelyAccessible();

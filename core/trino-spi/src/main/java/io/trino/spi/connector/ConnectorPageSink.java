@@ -19,6 +19,9 @@ import io.trino.spi.Page;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * 用于写入数据
+ */
 public interface ConnectorPageSink
 {
     CompletableFuture<?> NOT_BLOCKED = CompletableFuture.completedFuture(null);
@@ -58,6 +61,7 @@ public interface ConnectorPageSink
      * Returns a future that will be completed when the page sink can accept
      * more pages.  If the page sink can accept more pages immediately,
      * this method should return {@code NOT_BLOCKED}.
+     * 【核心】逐条写入或者批量写入
      */
     CompletableFuture<?> appendPage(Page page);
 

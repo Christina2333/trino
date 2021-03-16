@@ -17,6 +17,9 @@ import io.airlift.configuration.Config;
 
 import java.io.File;
 
+/**
+ * 加载plugin配置
+ */
 public class ServerPluginsProviderConfig
 {
     private File installedPluginsDir = new File("plugin");

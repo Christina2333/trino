@@ -45,6 +45,11 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 
+/**
+ * @see Connector
+ * 中的元数据相关部分，例如：
+ * show schemas; show tables; desc table xxxxx; drop table
+ */
 public interface ConnectorMetadata
 {
     /**
@@ -58,6 +63,7 @@ public interface ConnectorMetadata
 
     /**
      * Returns the schemas provided by this connector.
+     * 获取数据库
      */
     default List<String> listSchemaNames(ConnectorSession session)
     {

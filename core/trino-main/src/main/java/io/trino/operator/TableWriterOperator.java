@@ -58,6 +58,9 @@ import static io.trino.sql.planner.plan.TableWriterNode.InsertTarget;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
+/**
+ * 向表中写数据的operator
+ */
 public class TableWriterOperator
         implements Operator
 {
@@ -113,6 +116,10 @@ public class TableWriterOperator
             return new TableWriterOperator(context, createPageSink(), columnChannels, notNullChannelColumnNames, statisticsAggregationOperator, types, statisticsCpuTimerEnabled);
         }
 
+        /**
+         * 创建pageSink,通过pageSinkProvider创建
+         * @return
+         */
         private ConnectorPageSink createPageSink()
         {
             if (target instanceof CreateTarget) {
@@ -147,6 +154,9 @@ public class TableWriterOperator
 
     private final OperatorContext operatorContext;
     private final LocalMemoryContext pageSinkMemoryContext;
+    /**
+     * 写入数据
+     */
     private final ConnectorPageSink pageSink;
     private final List<Integer> columnChannels;
     private final List<String> notNullChannelColumnNames;
@@ -254,6 +264,7 @@ public class TableWriterOperator
         timer.end(statisticsTiming);
 
         ListenableFuture<?> blockedOnAggregation = statisticAggregationOperator.isBlocked();
+        // 写入数据入口
         CompletableFuture<?> future = pageSink.appendPage(new Page(blocks));
         updateMemoryUsage();
         ListenableFuture<?> blockedOnWrite = toListenableFuture(future);

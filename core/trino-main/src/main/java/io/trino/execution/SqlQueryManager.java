@@ -220,6 +220,10 @@ public class SqlQueryManager
                 .ifPresent(QueryExecution::recordHeartbeat);
     }
 
+    /**
+     * 查询入口
+     * @param queryExecution
+     */
     @Override
     public void createQuery(QueryExecution queryExecution)
     {
@@ -234,6 +238,7 @@ public class SqlQueryManager
             queryTracker.expireQuery(queryExecution.getQueryId());
         });
 
+        // 查询
         queryExecution.start();
     }
 

@@ -63,7 +63,13 @@ public class PluginManager
     private static final Logger log = Logger.get(PluginManager.class);
 
     private final PluginsProvider pluginsProvider;
+    /**
+     * connector管理
+     */
     private final ConnectorManager connectorManager;
+    /**
+     * 元数据管理manager
+     */
     private final MetadataManager metadataManager;
     private final ResourceGroupManager<?> resourceGroupManager;
     private final AccessControlManager accessControlManager;
@@ -100,6 +106,9 @@ public class PluginManager
         this.sessionPropertyDefaults = requireNonNull(sessionPropertyDefaults, "sessionPropertyDefaults is null");
     }
 
+    /**
+     * 加载插件
+     */
     public void loadPlugins()
     {
         if (!pluginsLoading.compareAndSet(false, true)) {
@@ -149,6 +158,11 @@ public class PluginManager
         metadataManager.verifyTypes();
     }
 
+    /**
+     * 安装插件
+     * @param plugin
+     * @param duplicatePluginClassLoaderFactory
+     */
     private void installPluginInternal(Plugin plugin, Supplier<ClassLoader> duplicatePluginClassLoaderFactory)
     {
         for (BlockEncoding blockEncoding : plugin.getBlockEncodings()) {

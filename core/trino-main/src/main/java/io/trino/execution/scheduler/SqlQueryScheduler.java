@@ -535,6 +535,9 @@ public class SqlQueryScheduler
         }
     }
 
+    /**
+     * worker开始执行查询
+     */
     private void schedule()
     {
         try (SetThreadName ignored = new SetThreadName("Query-%s", queryStateMachine.getQueryId())) {

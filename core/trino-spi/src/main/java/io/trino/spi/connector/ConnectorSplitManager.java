@@ -17,6 +17,11 @@ import io.trino.spi.predicate.TupleDomain;
 
 import java.util.function.Supplier;
 
+/**
+ * 用来解析sql中的条件查询
+ * 每个Task会把数据分为多个split
+ * 每个split上运行一个driver，经多个operator操作
+ */
 public interface ConnectorSplitManager
 {
     @Deprecated

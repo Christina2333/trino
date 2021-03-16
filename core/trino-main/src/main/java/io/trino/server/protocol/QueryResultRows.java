@@ -66,7 +66,13 @@ public class QueryResultRows
         implements Iterable<List<Object>>
 {
     private final ConnectorSession session;
+    /**
+     * 带展示的指标维度
+     */
     private final Optional<List<ColumnAndType>> columns;
+    /**
+     * 带展示的数据
+     */
     private final Deque<Page> pages;
     private final Optional<Consumer<Throwable>> exceptionConsumer;
     private final long totalRows;

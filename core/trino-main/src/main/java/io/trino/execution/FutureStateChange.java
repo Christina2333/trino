@@ -27,6 +27,11 @@ import java.util.concurrent.Executor;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * xx变更时异步执行的任务
+ * 用于执行完监听器操作之类，把对应的监听器移除
+ * @param <T>
+ */
 @ThreadSafe
 public class FutureStateChange<T>
 {
@@ -55,6 +60,7 @@ public class FutureStateChange<T>
 
     public void complete(T newState)
     {
+        // 启动状态变更的任务
         fireStateChange(newState, directExecutor());
     }
 
@@ -67,11 +73,13 @@ public class FutureStateChange<T>
     {
         requireNonNull(executor, "executor is null");
         Set<SettableFuture<T>> futures;
+        // 移除全部监听器
         synchronized (listeners) {
             futures = ImmutableSet.copyOf(listeners);
             listeners.clear();
         }
 
+        // 设置异步任务的新状态
         for (SettableFuture<T> future : futures) {
             executor.execute(() -> future.set(newState));
         }

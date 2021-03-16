@@ -46,13 +46,25 @@ public class StateMachine<T>
     private static final Logger log = Logger.get(StateMachine.class);
 
     private final String name;
+    /**
+     * 执行变更的线程池
+     */
     private final Executor executor;
     private final Object lock = new Object();
+    /**
+     * 终止状态
+     */
     private final Set<T> terminalStates;
 
+    /**
+     * 当前状态
+     */
     @GuardedBy("lock")
     private volatile T state;
 
+    /**
+     * 状态变更的监听器
+     */
     @GuardedBy("lock")
     private final List<StateChangeListener<T>> stateChangeListeners = new ArrayList<>();
 
@@ -138,6 +150,7 @@ public class StateMachine<T>
             }
         }
 
+        // 执行状态变更的异步任务及监听器操作
         fireStateChanged(newState, futureStateChange, stateChangeListeners);
         return oldState;
     }
@@ -145,7 +158,10 @@ public class StateMachine<T>
     /**
      * Sets the state if the current state satisfies the specified predicate.
      * If the new state does not {@code .equals()} the current state, listeners and waiters will be notified.
-     *
+     * [核心]状态变更时调用的方法
+     * (1)修改状态
+     * (2)执行状态变更的异步任务 -- 移除全部监听器后再执行监听器内容
+     * (3)执行状态变更的监听器
      * @return true if the state is set
      */
     public boolean setIf(T newState, Predicate<T> predicate)
@@ -215,11 +231,18 @@ public class StateMachine<T>
         return true;
     }
 
+    /**
+     * 启动状态变更
+     * @param newState
+     * @param futureStateChange    状态变更需要执行的异步任务
+     * @param stateChangeListeners 状态变更需要执行的监听器
+     */
     private void fireStateChanged(T newState, FutureStateChange<T> futureStateChange, List<StateChangeListener<T>> stateChangeListeners)
     {
         checkState(!Thread.holdsLock(lock), "Cannot fire state change event while holding the lock");
         requireNonNull(newState, "newState is null");
 
+        // 先把监听器移除，再执行监听器中的操作
         // always fire listener callbacks from a different thread
         safeExecute(() -> {
             checkState(!Thread.holdsLock(lock), "Cannot notify while holding the lock");
@@ -229,12 +252,18 @@ public class StateMachine<T>
             catch (Throwable e) {
                 log.error(e, "Error setting future state for %s", name);
             }
+            // 执行监听器中的操作
             for (StateChangeListener<T> stateChangeListener : stateChangeListeners) {
                 fireStateChangedListener(newState, stateChangeListener);
             }
         });
     }
 
+    /**
+     * 启动状态变更的监听器
+     * @param newState
+     * @param stateChangeListener
+     */
     private void fireStateChangedListener(T newState, StateChangeListener<T> stateChangeListener)
     {
         try {
@@ -303,8 +332,16 @@ public class StateMachine<T>
         }
     }
 
+    /**
+     * 状态变更监听器
+     * @param <T> 状态
+     */
     public interface StateChangeListener<T>
     {
+        /**
+         * 变为新状态时触发的行动
+         * @param newState
+         */
         void stateChanged(T newState);
     }
 

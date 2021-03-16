@@ -15,6 +15,9 @@ package io.trino.spi.connector;
 
 import java.util.Map;
 
+/**
+ * 用于创建connector
+ */
 public interface ConnectorFactory
 {
     String getName();
@@ -23,6 +26,7 @@ public interface ConnectorFactory
      * Gets the default handle resolver for connectors created by this factory.
      * Must return a non-null result when {@link Connector#getHandleResolver()}
      * is not implemented (or it returns empty result).
+     * 用于对数据解析处理
      */
     default ConnectorHandleResolver getHandleResolver()
     {

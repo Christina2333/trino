@@ -13,9 +13,27 @@
  */
 package io.trino.spi.connector;
 
+/**
+ * 用于创建ConnectorPageSink
+ * ConnectorPageSink可以向第三方数据存储引擎写入数据
+ */
 public interface ConnectorPageSinkProvider
 {
+    /**
+     * create table xxx as select * from table_a limit 11;
+     * @param transactionHandle
+     * @param session
+     * @param outputTableHandle
+     * @return
+     */
     ConnectorPageSink createPageSink(ConnectorTransactionHandle transactionHandle, ConnectorSession session, ConnectorOutputTableHandle outputTableHandle);
 
+    /**
+     * insert table xxx as select * from table_a limit 11;
+     * @param transactionHandle
+     * @param session
+     * @param insertTableHandle
+     * @return
+     */
     ConnectorPageSink createPageSink(ConnectorTransactionHandle transactionHandle, ConnectorSession session, ConnectorInsertTableHandle insertTableHandle);
 }

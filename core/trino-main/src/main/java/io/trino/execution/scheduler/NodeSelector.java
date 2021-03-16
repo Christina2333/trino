@@ -38,7 +38,7 @@ public interface NodeSelector
 
     /**
      * Identifies the nodes for running the specified splits.
-     *
+     * 为splits分配运行的worker节点
      * @param splits the splits that need to be assigned to nodes
      * @return a multimap from node to splits only for splits for which we could identify a node to schedule on.
      * If we cannot find an assignment for a split, it is not included in the map. Also returns a future indicating when

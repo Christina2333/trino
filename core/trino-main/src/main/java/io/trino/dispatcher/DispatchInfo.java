@@ -20,11 +20,23 @@ import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 貌似是一个描述排队情况的info
+ */
 public class DispatchInfo
 {
+    /**
+     * 负责处理请求的CoordinatorLocation
+     */
     private final Optional<CoordinatorLocation> coordinatorLocation;
     private final Optional<ExecutionFailureInfo> failureInfo;
+    /**
+     * 花费的时间
+     */
     private final Duration elapsedTime;
+    /**
+     * 排队的时间
+     */
     private final Duration queuedTime;
 
     public static DispatchInfo queued(Duration elapsedTime, Duration queuedTime)

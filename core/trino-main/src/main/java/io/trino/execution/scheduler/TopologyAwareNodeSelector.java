@@ -109,6 +109,12 @@ public class TopologyAwareNodeSelector
         return selectNodes(limit, randomizedNodes(nodeMap.get().get(), includeCoordinator, excludedNodes));
     }
 
+    /**
+     * 为split计算运行的worker节点
+     * @param splits the splits that need to be assigned to nodes
+     * @param existingTasks
+     * @return
+     */
     @Override
     public SplitPlacementResult computeAssignments(Set<Split> splits, List<RemoteTask> existingTasks)
     {
@@ -121,6 +127,7 @@ public class TopologyAwareNodeSelector
         Set<InternalNode> blockedExactNodes = new HashSet<>();
         boolean splitWaitingForAnyNode = false;
         for (Split split : splits) {
+            // 如果split不需要分配到指定节点
             if (!split.isRemotelyAccessible()) {
                 List<InternalNode> candidateNodes = selectExactNodes(nodeMap, split.getAddresses(), includeCoordinator);
                 if (candidateNodes.isEmpty()) {

@@ -30,15 +30,32 @@ import static com.google.common.collect.Iterables.unmodifiableIterable;
 import static io.trino.client.FixJsonDataUtils.fixData;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 查询结果,http请求实际返回的结果
+ * (1)查询到的数据返回
+ * (2)getStatus的返回
+ */
 @Immutable
 public class QueryResults
         implements QueryStatusInfo, QueryData
 {
     private final String id;
     private final URI infoUri;
+    /**
+     * 用于取消已经部分执行的查询
+     */
     private final URI partialCancelUri;
+    /**
+     * 下一次查询的uri
+     */
     private final URI nextUri;
+    /**
+     * 查询结果列信息
+     */
     private final List<Column> columns;
+    /**
+     * 查询结果
+     */
     private final Iterable<List<Object>> data;
     private final StatementStats stats;
     private final QueryError error;

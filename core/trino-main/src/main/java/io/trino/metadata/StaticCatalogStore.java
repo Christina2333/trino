@@ -33,11 +33,20 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkState;
 import static io.airlift.configuration.ConfigurationLoader.loadPropertiesFrom;
 
+/**
+ * 加载catalog
+ */
 public class StaticCatalogStore
 {
     private static final Logger log = Logger.get(StaticCatalogStore.class);
     private final ConnectorManager connectorManager;
+    /**
+     * catalog的根目录
+     */
     private final File catalogConfigurationDir;
+    /**
+     * 不加载的catalog
+     */
     private final Set<String> disabledCatalogs;
     private final AtomicBoolean catalogsLoading = new AtomicBoolean();
 
@@ -70,6 +79,11 @@ public class StaticCatalogStore
         }
     }
 
+    /**
+     * 加载单个catalog
+     * @param file catalog配置文件
+     * @throws Exception
+     */
     private void loadCatalog(File file)
             throws Exception
     {

@@ -127,9 +127,14 @@ public class QueryStateMachine
     private final AtomicLong peakTaskUserMemory = new AtomicLong();
     private final AtomicLong peakTaskRevocableMemory = new AtomicLong();
     private final AtomicLong peakTaskTotalMemory = new AtomicLong();
-
+    /**
+     * 记录状态变更各时间点
+     */
     private final QueryStateTimer queryStateTimer;
 
+    /**
+     * 查询状态机
+     */
     private final StateMachine<QueryState> queryState;
     private final AtomicBoolean queryCleanedUp = new AtomicBoolean();
 
@@ -789,36 +794,66 @@ public class QueryStateMachine
         return queryState.get().isDone();
     }
 
+    /**
+     * 从排队状态到等待资源分配（还没到coordinator中）
+     * 状态变更，执行监听器
+     * @see QueryState#WAITING_FOR_RESOURCES
+     * @return
+     */
     public boolean transitionToWaitingForResources()
     {
         queryStateTimer.beginWaitingForResources();
         return queryState.setIf(WAITING_FOR_RESOURCES, currentState -> currentState.ordinal() < WAITING_FOR_RESOURCES.ordinal());
     }
 
+    /**
+     * 分发到某个coordinator
+     * @see QueryState#DISPATCHING
+     * @return
+     */
     public boolean transitionToDispatching()
     {
         queryStateTimer.beginDispatching();
         return queryState.setIf(DISPATCHING, currentState -> currentState.ordinal() < DISPATCHING.ordinal());
     }
 
+    /**
+     * coordinator正在生成执行计划
+     * @see QueryState#PLANNING
+     * @return
+     */
     public boolean transitionToPlanning()
     {
         queryStateTimer.beginPlanning();
         return queryState.setIf(PLANNING, currentState -> currentState.ordinal() < PLANNING.ordinal());
     }
 
+    /**
+     * worker中开始执行
+     * @see QueryState#STARTING
+     * @return
+     */
     public boolean transitionToStarting()
     {
         queryStateTimer.beginStarting();
         return queryState.setIf(STARTING, currentState -> currentState.ordinal() < STARTING.ordinal());
     }
 
+    /**
+     * worker上至少有一个task正在执行中
+     * @see QueryState#RUNNING
+     * @return
+     */
     public boolean transitionToRunning()
     {
         queryStateTimer.beginRunning();
         return queryState.setIf(RUNNING, currentState -> currentState.ordinal() < RUNNING.ordinal());
     }
 
+    /**
+     * @see QueryState#FINISHING
+     * @return
+     */
     public boolean transitionToFinishing()
     {
         queryStateTimer.beginFinishing();
@@ -859,6 +894,9 @@ public class QueryStateMachine
         return true;
     }
 
+    /**
+     * @see QueryState#FINISHED
+     */
     private void transitionToFinished()
     {
         queryStateTimer.endQuery();
@@ -866,6 +904,11 @@ public class QueryStateMachine
         queryState.setIf(FINISHED, currentState -> !currentState.isDone());
     }
 
+    /**
+     * @see QueryState#FAILED
+     * @param throwable
+     * @return
+     */
     public boolean transitionToFailed(Throwable throwable)
     {
         cleanupQueryQuietly();

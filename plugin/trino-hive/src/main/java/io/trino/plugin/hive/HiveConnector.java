@@ -42,13 +42,26 @@ import static io.trino.spi.transaction.IsolationLevel.READ_UNCOMMITTED;
 import static io.trino.spi.transaction.IsolationLevel.checkConnectorSupports;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 构成Connector的四个部分：
+ * Metadata，SplitManager，PageSourceManager，PageSinkManager
+ */
 public class HiveConnector
         implements Connector
 {
     private final LifeCycleManager lifeCycleManager;
     private final TransactionalMetadataFactory metadataFactory;
+    /**
+     * 划分split
+     */
     private final ConnectorSplitManager splitManager;
+    /**
+     * 从hive读取数据
+     */
     private final ConnectorPageSourceProvider pageSourceProvider;
+    /**
+     * 向hive写入数据
+     */
     private final ConnectorPageSinkProvider pageSinkProvider;
     private final ConnectorNodePartitioningProvider nodePartitioningProvider;
     private final Set<SystemTable> systemTables;
@@ -61,7 +74,9 @@ public class HiveConnector
 
     private final ConnectorAccessControl accessControl;
     private final ClassLoader classLoader;
-
+    /**
+     * 元数据部分
+     */
     private final HiveTransactionManager transactionManager;
 
     public HiveConnector(
@@ -106,6 +121,11 @@ public class HiveConnector
         return Optional.of(new HiveHandleResolver());
     }
 
+    /**
+     * 核心
+     * @param transaction
+     * @return
+     */
     @Override
     public ConnectorMetadata getMetadata(ConnectorTransactionHandle transaction)
     {
@@ -114,18 +134,30 @@ public class HiveConnector
         return new ClassLoaderSafeConnectorMetadata(metadata, classLoader);
     }
 
+    /**
+     * 核心
+     * @return
+     */
     @Override
     public ConnectorSplitManager getSplitManager()
     {
         return splitManager;
     }
 
+    /**
+     * 核心
+     * @return
+     */
     @Override
     public ConnectorPageSourceProvider getPageSourceProvider()
     {
         return pageSourceProvider;
     }
 
+    /**
+     * 核心
+     * @return
+     */
     @Override
     public ConnectorPageSinkProvider getPageSinkProvider()
     {

@@ -24,6 +24,9 @@ import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 表统计信息
+ */
 public final class TableStatistics
 {
     private static final TableStatistics EMPTY = TableStatistics.builder().build();

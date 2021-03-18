@@ -19,6 +19,10 @@ import java.util.Set;
 
 public interface ExecutionSchedule
 {
+    /**
+     * 返回全部未调度的SqlStageExecution
+     * @return
+     */
     Set<SqlStageExecution> getStagesToSchedule();
 
     boolean isFinished();

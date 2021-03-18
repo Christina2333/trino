@@ -279,6 +279,10 @@ import static org.apache.hadoop.hive.ql.io.AcidUtils.deltaSubdir;
 import static org.apache.hadoop.hive.ql.io.AcidUtils.isFullAcidTable;
 import static org.apache.hadoop.hive.ql.io.AcidUtils.isTransactionalTable;
 
+/**
+ * hive的元数据部分
+ * hive3.0之后支持了事务，因此实现TransactionalMetadata
+ */
 public class HiveMetadata
         implements TransactionalMetadata
 {
@@ -359,6 +363,11 @@ public class HiveMetadata
         return metastore;
     }
 
+    /**
+     * 获取全部数据库
+     * @param session
+     * @return
+     */
     @Override
     public List<String> listSchemaNames(ConnectorSession session)
     {

@@ -90,6 +90,15 @@ public class LocalDispatchQueryFactory
         this.executor = requireNonNull(dispatchExecutor, "executorService is null").getExecutor();
     }
 
+    /**
+     * 会启动查询
+     * @param session
+     * @param query
+     * @param preparedQuery
+     * @param slug
+     * @param resourceGroup
+     * @return
+     */
     @Override
     public DispatchQuery createDispatchQuery(
             Session session,
@@ -99,6 +108,7 @@ public class LocalDispatchQueryFactory
             ResourceGroupId resourceGroup)
     {
         WarningCollector warningCollector = warningCollectorFactory.create();
+        // 1.创建状态机
         QueryStateMachine stateMachine = QueryStateMachine.begin(
                 query,
                 preparedQuery.getPrepareSql(),
@@ -129,7 +139,6 @@ public class LocalDispatchQueryFactory
             }
 
             try {
-                // [核心]执行查询
                 return queryExecutionFactory.createQueryExecution(preparedQuery, stateMachine, slug, warningCollector);
             }
             catch (Throwable e) {
@@ -144,7 +153,7 @@ public class LocalDispatchQueryFactory
                 queryMonitor,
                 clusterSizeMonitor,
                 executor,
-                // 查询
+                // 查询【核心】
                 queryManager::createQuery);
     }
 }

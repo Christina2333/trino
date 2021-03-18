@@ -51,6 +51,13 @@ public class HiveConnectorFactory
         return name;
     }
 
+    /**
+     * 创建hive的connector
+     * @param catalogName
+     * @param config
+     * @param context
+     * @return
+     */
     @Override
     public Connector create(String catalogName, Map<String, String> config, ConnectorContext context)
     {

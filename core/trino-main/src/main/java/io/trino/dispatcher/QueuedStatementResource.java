@@ -396,6 +396,7 @@ public class QueuedStatementResource
             // if query submission has not finished, wait for it to finish
             synchronized (this) {
                 if (querySubmissionFuture == null) {
+                    // 【核心】
                     querySubmissionFuture = dispatchManager.createQuery(queryId, slug, sessionContext, query);
                 }
                 if (!querySubmissionFuture.isDone()) {

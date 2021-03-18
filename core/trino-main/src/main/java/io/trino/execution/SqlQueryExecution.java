@@ -122,6 +122,9 @@ public class SqlQueryExecution
     private final SqlParser sqlParser;
     private final SplitManager splitManager;
     private final NodePartitioningManager nodePartitioningManager;
+    /**
+     * 将task分配给node的核心模块，stage调度的时候会详细说明
+     */
     private final NodeScheduler nodeScheduler;
     /**
      * 执行计划优化规则
@@ -416,10 +419,12 @@ public class SqlQueryExecution
                     return;
                 }
 
+                // 逻辑planner生成执行计划，并进行优化
                 PlanRoot plan = planQuery();
                 // DynamicFilterService needs plan for query to be registered.
                 // Query should be registered before dynamic filter suppliers are requested in distribution planning.
                 registerDynamicFilteringQuery(plan);
+                // 逻辑执行计划进行分段，准备分布式执行计划
                 planDistribution(plan);
 
                 if (!stateMachine.transitionToStarting()) {
@@ -485,10 +490,11 @@ public class SqlQueryExecution
                 statsCalculator,
                 costCalculator,
                 stateMachine.getWarningCollector());
+        // 生成逻辑执行计划
         Plan plan = logicalPlanner.plan(analysis);
         queryPlan.set(plan);
 
-        // fragment the plan
+        // fragment the plan 一个plan拆分成多个subPlan
         SubPlan fragmentedPlan = planFragmenter.createSubPlans(stateMachine.getSession(), plan, false, stateMachine.getWarningCollector());
 
         // extract inputs
@@ -527,7 +533,7 @@ public class SqlQueryExecution
                 .withBuffer(OUTPUT_BUFFER_ID, BROADCAST_PARTITION_ID)
                 .withNoMoreBufferIds();
 
-        // build the stage execution objects (this doesn't schedule execution)
+        // build the stage execution objects (this doesn't schedule execution) 创建SqlQueryScheduler
         SqlQueryScheduler scheduler = createSqlQueryScheduler(
                 stateMachine,
                 outputStageExecutionPlan,

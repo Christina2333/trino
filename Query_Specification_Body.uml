@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>io.trino.sql.tree.QuerySpecification</OriginalElement>
+  <nodes>
+    <node x="189.5" y="0.0">io.trino.sql.tree.Node</node>
+    <node x="39.0" y="102.0">io.trino.sql.tree.Relation</node>
+    <node x="170.0" y="102.0">io.trino.sql.tree.Statement</node>
+    <node x="35.0" y="204.0">io.trino.sql.tree.QueryBody</node>
+    <node x="309.0" y="102.0">io.trino.sql.tree.Expression</node>
+    <node x="0.0" y="306.0">io.trino.sql.tree.QuerySpecification</node>
+    <node x="186.0" y="204.0">io.trino.sql.tree.Query</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="io.trino.sql.tree.Query" target="io.trino.sql.tree.Statement">
+      <point x="0.0" y="-26.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="io.trino.sql.tree.QueryBody" target="io.trino.sql.tree.Relation">
+      <point x="0.0" y="-26.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="io.trino.sql.tree.Expression" target="io.trino.sql.tree.Node">
+      <point x="0.0" y="-26.0" />
+      <point x="372.0" y="77.0" />
+      <point x="256.1666666666667" y="77.0" />
+      <point x="26.666666666666686" y="26.0" />
+    </edge>
+    <edge source="io.trino.sql.tree.Relation" target="io.trino.sql.tree.Node">
+      <point x="0.0" y="-26.0" />
+      <point x="94.5" y="77.0" />
+      <point x="202.83333333333334" y="77.0" />
+      <point x="-26.666666666666657" y="26.0" />
+    </edge>
+    <edge source="io.trino.sql.tree.QuerySpecification" target="io.trino.sql.tree.QueryBody">
+      <point x="0.0" y="-26.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="io.trino.sql.tree.Statement" target="io.trino.sql.tree.Node">
+      <point x="0.0" y="-26.0" />
+      <point x="0.0" y="26.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="94.5" y="179.0" />
+  <SelectedNodes />
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

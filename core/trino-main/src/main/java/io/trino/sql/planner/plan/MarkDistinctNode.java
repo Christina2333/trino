@@ -27,6 +27,10 @@ import java.util.Optional;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 逻辑执行计划中
+ * 处理count distinct节点
+ */
 @Immutable
 public class MarkDistinctNode
         extends PlanNode

@@ -33,6 +33,9 @@ import java.util.OptionalLong;
 import java.util.Set;
 import java.util.function.Function;
 
+/**
+ * 存储hive元数据
+ */
 public interface HiveMetastore
 {
     Optional<Database> getDatabase(String databaseName);

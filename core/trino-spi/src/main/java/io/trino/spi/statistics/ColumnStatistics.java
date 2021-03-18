@@ -19,6 +19,9 @@ import java.util.Optional;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 字段统计信息
+ */
 public final class ColumnStatistics
 {
     private static final ColumnStatistics EMPTY = new ColumnStatistics(Estimate.unknown(), Estimate.unknown(), Estimate.unknown(), Optional.empty());

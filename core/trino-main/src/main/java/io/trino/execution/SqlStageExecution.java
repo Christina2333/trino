@@ -430,6 +430,14 @@ public final class SqlStageExecution
         return newTasks.build();
     }
 
+    /**
+     * 执行任务
+     * @param node
+     * @param taskId
+     * @param sourceSplits
+     * @param totalPartitions
+     * @return
+     */
     private synchronized RemoteTask scheduleTask(InternalNode node, TaskId taskId, Multimap<PlanNodeId, Split> sourceSplits, OptionalInt totalPartitions)
     {
         checkArgument(!allTasks.contains(taskId), "A task with id %s already exists", taskId);
@@ -447,6 +455,7 @@ public final class SqlStageExecution
         OutputBuffers outputBuffers = this.outputBuffers.get();
         checkState(outputBuffers != null, "Initial output buffers must be set before a task can be scheduled");
 
+        // 创建remoteTask
         RemoteTask task = remoteTaskFactory.createRemoteTask(
                 stateMachine.getSession(),
                 taskId,
@@ -468,6 +477,7 @@ public final class SqlStageExecution
         task.addFinalTaskInfoListener(this::updateFinalTaskInfo);
 
         if (!stateMachine.getState().isDone()) {
+            // 执行HttpRemoteTask任务
             task.start();
         }
         else {

@@ -29,6 +29,10 @@ import static io.trino.spi.StandardErrorCode.NOT_SUPPORTED;
 import static io.trino.util.Failures.checkCondition;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 逻辑执行计划中
+ * order by ... limit高效执行
+ */
 @Immutable
 public class TopNNode
         extends PlanNode

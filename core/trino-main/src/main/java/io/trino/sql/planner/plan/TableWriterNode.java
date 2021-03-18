@@ -40,6 +40,10 @@ import java.util.Set;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 逻辑执行计划中
+ * 写入表数据
+ */
 @Immutable
 public class TableWriterNode
         extends PlanNode

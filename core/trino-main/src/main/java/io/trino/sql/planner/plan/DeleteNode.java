@@ -26,6 +26,9 @@ import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 执行计划中delete操作节点
+ */
 @Immutable
 public class DeleteNode
         extends PlanNode

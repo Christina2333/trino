@@ -27,6 +27,10 @@ import java.util.Optional;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 逻辑执行计划中
+ * 类似与ExchangeNode，分布式执行计划中，不同stage之间交换数据的节点
+ */
 @Immutable
 public class RemoteSourceNode
         extends PlanNode

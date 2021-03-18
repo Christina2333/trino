@@ -42,6 +42,10 @@ import static io.trino.sql.tree.FrameBound.Type.UNBOUNDED_PRECEDING;
 import static io.trino.sql.tree.WindowFrame.Type.RANGE;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 逻辑执行计划中
+ * 处理窗函数
+ */
 @Immutable
 public class WindowNode
         extends PlanNode

@@ -221,7 +221,7 @@ public class SqlQueryManager
     }
 
     /**
-     * 查询入口
+     * 查询入口【核心】
      * @param queryExecution
      */
     @Override

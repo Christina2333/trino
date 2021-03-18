@@ -40,6 +40,10 @@ import static io.trino.sql.planner.plan.ExchangeNode.Scope.REMOTE;
 import static io.trino.util.MoreLists.listOfListsCopy;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 逻辑执行计划中
+ * 不同stage之间交换数据的节点
+ */
 @Immutable
 public class ExchangeNode
         extends PlanNode

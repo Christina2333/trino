@@ -115,6 +115,9 @@ import static org.apache.hadoop.hive.metastore.TableType.MANAGED_TABLE;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.TXN_TIMEOUT;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.getTimeVar;
 
+/**
+ * hive的元数据信息
+ */
 public class SemiTransactionalHiveMetastore
         implements SqlStandardAccessControlMetadataMetastore
 {

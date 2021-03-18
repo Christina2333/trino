@@ -586,6 +586,10 @@ public class InternalResourceGroup
         }
     }
 
+    /**
+     * 执行查询
+     * @param query
+     */
     public void run(ManagedQueryExecution query)
     {
         synchronized (root) {
@@ -609,6 +613,7 @@ public class InternalResourceGroup
                 return;
             }
             if (canRun) {
+                // 后台执行
                 startInBackground(query);
             }
             else {
@@ -670,6 +675,7 @@ public class InternalResourceGroup
                 group = group.parent.get();
             }
             updateEligibility();
+            // 等待计算资源
             executor.execute(query::startWaitingForResources);
         }
     }

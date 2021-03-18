@@ -153,6 +153,12 @@ class RelationPlanner
         throw new IllegalStateException("Unsupported node type: " + node.getClass().getName());
     }
 
+    /**
+     * 生成TableScanNode
+     * @param node
+     * @param context
+     * @return
+     */
     @Override
     protected RelationPlan visitTable(Table node, Void context)
     {
@@ -203,6 +209,7 @@ class RelationPlanner
 
             List<Symbol> outputSymbols = outputSymbolsBuilder.build();
             boolean isDeleteTarget = analysis.isDeleteTarget(node);
+            // 生成TableScanNode
             PlanNode root = TableScanNode.newInstance(idAllocator.getNextId(), handle, outputSymbols, columns.build(), isDeleteTarget);
 
             plan = new RelationPlan(root, scope, outputSymbols, outerContext);
@@ -274,6 +281,12 @@ class RelationPlanner
         return new RelationPlan(planBuilder.getRoot(), plan.getScope(), plan.getFieldMappings(), outerContext);
     }
 
+    /**
+     * 处理有别名的Relation
+     * @param node
+     * @param context
+     * @return
+     */
     @Override
     protected RelationPlan visitAliasedRelation(AliasedRelation node, Void context)
     {
@@ -298,6 +311,12 @@ class RelationPlanner
         return new RelationPlan(root, analysis.getScope(node), mappings, outerContext);
     }
 
+    /**
+     * 添加SampleNode用于抽样
+     * @param node
+     * @param context
+     * @return
+     */
     @Override
     protected RelationPlan visitSampledRelation(SampledRelation node, Void context)
     {
@@ -318,6 +337,13 @@ class RelationPlanner
         return new RelationPlan(plan.getRoot(), analysis.getScope(node), plan.getFieldMappings(), outerContext);
     }
 
+    /**
+     * 根据不同join类型生成不同节点结构
+     * 左右两边生成对应的queryPlan，左右各添加一个ProjectNode，中间填一个JoinNode相连，上层加一个FilterNode，FilterNode作为join条件
+     * @param node
+     * @param context
+     * @return
+     */
     @Override
     protected RelationPlan visitJoin(Join node, Void context)
     {
@@ -772,6 +798,12 @@ class RelationPlanner
         return new RelationPlan(plan.getRoot(), analysis.getScope(node), plan.getFieldMappings(), outerContext);
     }
 
+    /**
+     * 使用QueryPlanner处理Query
+     * @param node
+     * @param context
+     * @return
+     */
     @Override
     protected RelationPlan visitQuery(Query node, Void context)
     {
@@ -779,6 +811,12 @@ class RelationPlanner
                 .plan(node);
     }
 
+    /**
+     * 使用QueryPlanner处理QueryBody
+     * @param node
+     * @param context
+     * @return
+     */
     @Override
     protected RelationPlan visitQuerySpecification(QuerySpecification node, Void context)
     {

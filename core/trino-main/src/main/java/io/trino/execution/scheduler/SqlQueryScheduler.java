@@ -113,9 +113,11 @@ public class SqlQueryScheduler
 {
     private final QueryStateMachine queryStateMachine;
     private final ExecutionPolicy executionPolicy;
+    // 重点
     private final Map<StageId, SqlStageExecution> stages;
     private final ExecutorService executor;
     private final StageId rootStageId;
+    // 重点
     private final Map<StageId, StageScheduler> stageSchedulers;
     private final Map<StageId, StageLinkage> stageLinkages;
     private final SplitSchedulerStats schedulerStats;
@@ -211,6 +213,7 @@ public class SqlQueryScheduler
                 stageSchedulers,
                 stageLinkages);
 
+        // SqlStageExecution
         SqlStageExecution rootStage = stages.get(0);
         rootStage.setOutputBuffers(rootOutputBuffers);
         this.rootStageId = rootStage.getStageId();
@@ -536,19 +539,21 @@ public class SqlQueryScheduler
     }
 
     /**
-     * worker开始执行查询
+     * worker开始执行查询【核心】
      */
     private void schedule()
     {
         try (SetThreadName ignored = new SetThreadName("Query-%s", queryStateMachine.getQueryId())) {
             Set<StageId> completedStages = new HashSet<>();
+            // [核心]创建AllAtOnceExecutionSchedule
             ExecutionSchedule executionSchedule = executionPolicy.createExecutionSchedule(stages.values());
             while (!executionSchedule.isFinished()) {
                 List<ListenableFuture<?>> blockedStages = new ArrayList<>();
+                // 遍历SqlStageExecution
                 for (SqlStageExecution stage : executionSchedule.getStagesToSchedule()) {
                     stage.beginScheduling();
 
-                    // perform some scheduling work
+                    // perform some scheduling work 执行每个stageSchedule
                     ScheduleResult result = stageSchedulers.get(stage.getStageId())
                             .schedule();
 

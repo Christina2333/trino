@@ -28,6 +28,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Iterables.concat;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 逻辑执行计划中
+ * 处理窗函数RowNumber
+ */
 @Immutable
 public final class RowNumberNode
         extends PlanNode

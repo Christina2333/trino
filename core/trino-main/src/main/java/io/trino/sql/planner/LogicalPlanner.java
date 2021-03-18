@@ -198,12 +198,21 @@ public class LogicalPlanner
         return plan(analysis, stage, analysis.getStatement() instanceof Explain || isCollectPlanStatisticsForAllQueries(session));
     }
 
+    /**
+     * 逻辑planner开始生成逻辑执行计划
+     * @param analysis 分析结果
+     * @param stage    逻辑执行计划阶段
+     * @param collectPlanStatistics  是否收集cpu内存等统计信息（比如explain时为true）
+     * @return
+     */
     public Plan plan(Analysis analysis, Stage stage, boolean collectPlanStatistics)
     {
         PlanNode root = planStatement(analysis, analysis.getStatement());
 
+        // 检查执行计划有效性
         planSanityChecker.validateIntermediatePlan(root, session, metadata, typeOperators, typeAnalyzer, symbolAllocator.getTypes(), warningCollector);
 
+        // 执行计划优化
         if (stage.ordinal() >= OPTIMIZED.ordinal()) {
             for (PlanOptimizer optimizer : planOptimizers) {
                 root = optimizer.optimize(root, session, symbolAllocator.getTypes(), symbolAllocator, idAllocator, warningCollector);
@@ -216,6 +225,7 @@ public class LogicalPlanner
             planSanityChecker.validateFinalPlan(root, session, metadata, typeOperators, typeAnalyzer, symbolAllocator.getTypes(), warningCollector);
         }
 
+        // 填充收集的cpu内存统计信息
         TypeProvider types = symbolAllocator.getTypes();
 
         StatsAndCosts statsAndCosts = StatsAndCosts.empty();
@@ -235,6 +245,7 @@ public class LogicalPlanner
             PlanNode source = new ValuesNode(idAllocator.getNextId(), ImmutableList.of(symbol), ImmutableList.of(new Row(ImmutableList.of(new GenericLiteral("BIGINT", "0")))));
             return new OutputNode(idAllocator.getNextId(), source, ImmutableList.of("rows"), ImmutableList.of(symbol));
         }
+        // 查询走这
         return createOutputPlan(planStatementWithoutOutput(analysis, statement), analysis);
     }
 

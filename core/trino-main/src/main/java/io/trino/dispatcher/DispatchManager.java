@@ -180,17 +180,18 @@ public class DispatchManager
                 throw new TrinoException(QUERY_TEXT_TOO_LARGE, format("Query text length (%s) exceeds the maximum length (%s)", queryLength, maxQueryLength));
             }
 
-            // decode session
+            // decode session 创建一个session
             session = sessionSupplier.createSession(queryId, sessionContext);
 
             // check query execute permissions
             accessControl.checkCanExecuteQuery(sessionContext.getIdentity());
 
-            // prepare query
+            // prepare query 得到一个已经解析的查询语句
             preparedQuery = queryPreparer.prepareQuery(session, query);
 
             // select resource group
             Optional<String> queryType = getQueryType(preparedQuery.getStatement().getClass()).map(Enum::name);
+            // 为查询分配一个资源组，用于执行查询
             SelectionContext<C> selectionContext = resourceGroupManager.selectGroup(new SelectionCriteria(
                     sessionContext.getIdentity().getPrincipal().isPresent(),
                     sessionContext.getIdentity().getUser(),
@@ -203,10 +204,10 @@ public class DispatchManager
             // apply system default session properties (does not override user set properties)
             session = sessionPropertyDefaults.newSessionWithDefaultProperties(session, queryType, selectionContext.getResourceGroupId());
 
-            // mark existing transaction as active
+            // mark existing transaction as active 进行必要的事务处理
             transactionManager.activateTransaction(session, isTransactionControlStatement(preparedQuery.getStatement()), accessControl);
 
-            // 返回QueryExecution
+            // 返回QueryExecution【核心】 将前几步产生的session，preparedQuery、resourceGroup组成一个dispatchQuery
             DispatchQuery dispatchQuery = dispatchQueryFactory.createDispatchQuery(
                     session,
                     query,

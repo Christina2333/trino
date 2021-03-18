@@ -111,6 +111,7 @@ public class LocalDispatchQuery
     @Override
     public void startWaitingForResources()
     {
+        // 状态变更
         if (stateMachine.transitionToWaitingForResources()) {
             waitForMinimumWorkers();
         }
@@ -126,7 +127,7 @@ public class LocalDispatchQuery
                 executionMinCount = getRequiredWorkers(session);
             }
             ListenableFuture<?> minimumWorkerFuture = clusterSizeMonitor.waitForMinimumWorkers(executionMinCount, getRequiredWorkersMaxWait(session));
-            // when worker requirement is met, start the execution
+            // when worker requirement is met, start the execution 执行查询
             addSuccessCallback(minimumWorkerFuture, () -> startExecution(queryExecution));
             addExceptionCallback(minimumWorkerFuture, throwable -> queryExecutor.execute(() -> stateMachine.transitionToFailed(throwable)));
 
@@ -142,6 +143,7 @@ public class LocalDispatchQuery
     private void startExecution(QueryExecution queryExecution)
     {
         queryExecutor.execute(() -> {
+            // 状态变更
             if (stateMachine.transitionToDispatching()) {
                 try {
                     querySubmitter.accept(queryExecution);

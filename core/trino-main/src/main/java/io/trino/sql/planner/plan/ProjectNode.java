@@ -25,6 +25,11 @@ import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 逻辑执行计划中
+ * 将下层节点输出列映射成上层节点
+ * select a+1 from b 将TableScanNode的a列+1映射到OutputNode
+ */
 @Immutable
 public class ProjectNode
         extends PlanNode

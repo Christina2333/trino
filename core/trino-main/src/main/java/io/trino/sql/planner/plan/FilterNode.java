@@ -24,6 +24,10 @@ import javax.annotation.concurrent.Immutable;
 
 import java.util.List;
 
+/**
+ * 逻辑执行计划中
+ * 过滤节点
+ */
 @Immutable
 public class FilterNode
         extends PlanNode

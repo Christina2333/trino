@@ -42,6 +42,11 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static io.trino.sql.planner.plan.AggregationNode.Step.SINGLE;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 执行计划中，聚合操作的节点
+ * 有Final、partia、single三种，表示最终聚合、局部聚合、单点聚合
+ * 在优化器中会拆成局部聚合和最终聚合，类似MR任务中的map端局部reduce、reduce端最终reduce
+ */
 @Immutable
 public class AggregationNode
         extends PlanNode

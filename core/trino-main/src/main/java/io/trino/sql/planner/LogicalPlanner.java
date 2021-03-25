@@ -199,14 +199,15 @@ public class LogicalPlanner
     }
 
     /**
-     * 逻辑planner开始生成逻辑执行计划
+     * 逻辑planner开始生成逻辑执行计划并优化
      * @param analysis 分析结果
-     * @param stage    逻辑执行计划阶段
+     * @param stage    逻辑执行计划阶段,枚举
      * @param collectPlanStatistics  是否收集cpu内存等统计信息（比如explain时为true）
      * @return
      */
     public Plan plan(Analysis analysis, Stage stage, boolean collectPlanStatistics)
     {
+        // 获取执行计划
         PlanNode root = planStatement(analysis, analysis.getStatement());
 
         // 检查执行计划有效性

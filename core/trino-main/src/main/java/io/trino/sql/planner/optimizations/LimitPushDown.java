@@ -39,6 +39,9 @@ import java.util.Optional;
 import static com.google.common.base.MoreObjects.toStringHelper;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * limit条件下推，减小下层节点的数据量
+ */
 public class LimitPushDown
         implements PlanOptimizer
 {

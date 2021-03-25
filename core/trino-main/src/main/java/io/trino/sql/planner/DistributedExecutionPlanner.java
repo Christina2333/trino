@@ -95,6 +95,12 @@ public class DistributedExecutionPlanner
         this.dynamicFilterService = requireNonNull(dynamicFilterService, "dynamicFilterService is null");
     }
 
+    /**
+     * 获取stage的执行计划
+     * @param root
+     * @param session
+     * @return
+     */
     public StageExecutionPlan plan(SubPlan root, Session session)
     {
         ImmutableList.Builder<SplitSource> allSplitSources = ImmutableList.builder();
@@ -117,11 +123,20 @@ public class DistributedExecutionPlanner
         }
     }
 
+    /**
+     * 获取stage的执行计划，划分split
+     * @param root
+     * @param session
+     * @param allSplitSources 输入为空
+     * @return
+     */
     private StageExecutionPlan doPlan(SubPlan root, Session session, ImmutableList.Builder<SplitSource> allSplitSources)
     {
         PlanFragment currentFragment = root.getFragment();
 
         // get splits for this fragment, this is lazy so split assignments aren't actually calculated here
+        // visitor模式遍历
+        // 对节点进行splitManager.getSplits()操作来获取分片，针对hive：实现类是HiveSplitManager，内部实现是调用HiveSplitLoader.start()方法
         Map<PlanNodeId, SplitSource> splitSources = currentFragment.getRoot().accept(
                 new Visitor(session, currentFragment.getStageExecutionDescriptor(), TypeProvider.copyOf(currentFragment.getSymbols()), allSplitSources),
                 null);
@@ -129,6 +144,7 @@ public class DistributedExecutionPlanner
         // create child stages
         ImmutableList.Builder<StageExecutionPlan> dependencies = ImmutableList.builder();
         for (SubPlan childPlan : root.getChildren()) {
+            // 将子逻辑执行计划全部转化为带用层级关系的stage执行计划，划分split
             dependencies.add(doPlan(childPlan, session, allSplitSources));
         }
 
@@ -186,6 +202,12 @@ public class DistributedExecutionPlanner
             return visitScanAndFilter(node, Optional.empty());
         }
 
+        /**
+         * visit TableScan节点或者Filter节点，进行分片处理
+         * @param node
+         * @param filter
+         * @return
+         */
         private Map<PlanNodeId, SplitSource> visitScanAndFilter(TableScanNode node, Optional<FilterNode> filter)
         {
             List<DynamicFilters.Descriptor> dynamicFilters = filter
@@ -200,7 +222,7 @@ public class DistributedExecutionPlanner
                 dynamicFilter = dynamicFilterService.createDynamicFilter(session.getQueryId(), dynamicFilters, node.getAssignments(), typeProvider);
             }
 
-            // get dataSource for table
+            // get dataSource for table 此处用到了元数据的SplitManager
             SplitSource splitSource = splitManager.getSplits(
                     session,
                     node.getTable(),

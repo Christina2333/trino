@@ -433,6 +433,7 @@ public class SqlQueryExecution
                 }
 
                 // if query is not finished, start the scheduler, otherwise cancel it
+                // planDistribution中设置了SqlQueryScheduler
                 SqlQueryScheduler scheduler = queryScheduler.get();
 
                 if (!stateMachine.isDone()) {
@@ -490,7 +491,7 @@ public class SqlQueryExecution
                 statsCalculator,
                 costCalculator,
                 stateMachine.getWarningCollector());
-        // 生成逻辑执行计划
+        // 生成逻辑执行计划，并进行优化
         Plan plan = logicalPlanner.plan(analysis);
         queryPlan.set(plan);
 
@@ -507,10 +508,15 @@ public class SqlQueryExecution
         return new PlanRoot(fragmentedPlan, !explainAnalyze);
     }
 
+    /**
+     * 逻辑执行计划进行分段，准备分布式执行计划，创建stage执行计划
+     * @param plan
+     */
     private void planDistribution(PlanRoot plan)
     {
         // plan the execution on the active nodes
         DistributedExecutionPlanner distributedPlanner = new DistributedExecutionPlanner(splitManager, metadata, dynamicFilterService);
+        // 获取stage的执行计划
         StageExecutionPlan outputStageExecutionPlan = distributedPlanner.plan(plan.getRoot(), stateMachine.getSession());
 
         // ensure split sources are closed
@@ -533,7 +539,8 @@ public class SqlQueryExecution
                 .withBuffer(OUTPUT_BUFFER_ID, BROADCAST_PARTITION_ID)
                 .withNoMoreBufferIds();
 
-        // build the stage execution objects (this doesn't schedule execution) 创建SqlQueryScheduler
+        // build the stage execution objects (this doesn't schedule execution)
+        // 创建SqlQueryScheduler
         SqlQueryScheduler scheduler = createSqlQueryScheduler(
                 stateMachine,
                 outputStageExecutionPlan,

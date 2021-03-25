@@ -15,6 +15,9 @@ package io.trino.execution.scheduler;
 
 import java.io.Closeable;
 
+/**
+ * stage调度器
+ */
 public interface StageScheduler
         extends Closeable
 {

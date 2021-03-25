@@ -812,7 +812,7 @@ class RelationPlanner
     }
 
     /**
-     * 使用QueryPlanner处理QueryBody
+     * 使用QueryPlanner处理QueryBody，QueryBody是抽象类，QuerySpecification是一个具体实现
      * @param node
      * @param context
      * @return

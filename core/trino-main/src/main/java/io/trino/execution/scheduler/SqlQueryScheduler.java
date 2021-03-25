@@ -120,6 +120,9 @@ public class SqlQueryScheduler
     // 重点
     private final Map<StageId, StageScheduler> stageSchedulers;
     private final Map<StageId, StageLinkage> stageLinkages;
+    /**
+     * stage执行记录
+     */
     private final SplitSchedulerStats schedulerStats;
     private final boolean summarizeTaskInfo;
     private final DynamicFilterService dynamicFilterService;
@@ -204,6 +207,7 @@ public class SqlQueryScheduler
                 remoteTaskFactory,
                 session,
                 splitBatchSize,
+                // 获取各个stage执行的节点
                 partitioningHandle -> partitioningCache.computeIfAbsent(partitioningHandle, handle -> nodePartitioningManager.getNodePartitioningMap(session, handle)),
                 nodePartitioningManager,
                 queryExecutor,
@@ -567,6 +571,7 @@ public class SqlQueryScheduler
                     stageLinkages.get(stage.getStageId())
                             .processScheduleResults(stage.getState(), result.getNewTasks());
                     schedulerStats.getSplitsScheduledPerIteration().add(result.getSplitsScheduled());
+                    // stage执行时如果block会对状态进行记录
                     if (result.getBlockedReason().isPresent()) {
                         switch (result.getBlockedReason().get()) {
                             case WRITER_SCALING:

@@ -63,6 +63,7 @@ public class HiveHdfsConfiguration
         }
         Configuration config = copy(hadoopConfiguration.get());
         for (DynamicConfigurationProvider provider : dynamicProviders) {
+            // 将hive.config.resource参数配置hadoop配置文件
             provider.updateConfiguration(config, context, uri);
         }
         return config;

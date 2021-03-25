@@ -46,8 +46,16 @@ import static com.google.common.util.concurrent.Futures.immediateFuture;
 import static io.airlift.concurrent.MoreFutures.whenAnyCompleteCancelOthers;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 将task分配给node的核心模块
+ * @see io.trino.metadata.InternalNodeManager
+ */
 public class NodeScheduler
 {
+    /**
+     * 用于获取nodeSelector
+     * @see NodeSelector
+     */
     private final NodeSelectorFactory nodeSelectorFactory;
 
     @Inject
@@ -56,11 +64,23 @@ public class NodeScheduler
         this.nodeSelectorFactory = requireNonNull(nodeSelectorFactory, "nodeSelectorFactory is null");
     }
 
+    /**
+     * 提供了NodeSelector,其中包括各个stage中task分配的算法
+     * @param catalogName
+     * @return
+     */
     public NodeSelector createNodeSelector(Optional<CatalogName> catalogName)
     {
+        // 只要你的网络使用了TCP/IP协议，实例化的NodeSelector都是TopologyAwareNodeSelector
         return nodeSelectorFactory.createNodeSelector(requireNonNull(catalogName, "catalogName is null"));
     }
 
+    /**
+     * 获取全部存活的节点列表
+     * @param nodeMap
+     * @param includeCoordinator
+     * @return
+     */
     public static List<InternalNode> getAllNodes(NodeMap nodeMap, boolean includeCoordinator)
     {
         return nodeMap.getNodesByHostAndPort().values().stream()
@@ -68,6 +88,12 @@ public class NodeScheduler
                 .collect(toImmutableList());
     }
 
+    /**
+     * 选取存活的Node列表
+     * @param limit
+     * @param candidates
+     * @return
+     */
     public static List<InternalNode> selectNodes(int limit, Iterator<InternalNode> candidates)
     {
         checkArgument(limit > 0, "limit must be at least 1");
@@ -80,6 +106,13 @@ public class NodeScheduler
         return selected;
     }
 
+    /**
+     * 打乱给定的NodeMap
+     * @param nodeMap
+     * @param includeCoordinator
+     * @param excludedNodes
+     * @return
+     */
     public static ResettableRandomizedIterator<InternalNode> randomizedNodes(NodeMap nodeMap, boolean includeCoordinator, Set<InternalNode> excludedNodes)
     {
         ImmutableList<InternalNode> nodes = nodeMap.getNodesByHostAndPort().values().stream()

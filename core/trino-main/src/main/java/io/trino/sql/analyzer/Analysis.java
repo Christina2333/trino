@@ -985,6 +985,7 @@ public class Analysis
         // unfoldedExpressions applies to the latter case, and is a list of subscript expressions
         // referencing each field of the row.
         private final Expression expression;
+
         private final Optional<List<Expression>> unfoldedExpressions;
 
         public SelectExpression(Expression expression, Optional<List<Expression>> unfoldedExpressions)

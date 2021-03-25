@@ -68,11 +68,23 @@ import static io.trino.spi.StandardErrorCode.GENERIC_INTERNAL_ERROR;
 import static io.trino.spi.StandardErrorCode.REMOTE_HOST_GONE;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * stage执行计划执行器
+ */
 @ThreadSafe
 public final class SqlStageExecution
 {
+    /**
+     * stage状态机及监听器
+     */
     private final StageStateMachine stateMachine;
+    /**
+     * 生成task的工厂类
+     */
     private final RemoteTaskFactory remoteTaskFactory;
+    /**
+     * 保存当前stage分配的task和节点映射列表
+     */
     private final NodeTaskMap nodeTaskMap;
     private final boolean summarizeTaskInfo;
     private final Executor executor;

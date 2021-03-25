@@ -35,6 +35,9 @@ import static java.util.Objects.requireNonNull;
 class PlanBuilder
 {
     private final TranslationMap translations;
+    /**
+     * 生成的Node树执行计划
+     */
     private final PlanNode root;
 
     public PlanBuilder(TranslationMap translations, PlanNode root)

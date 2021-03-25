@@ -153,7 +153,7 @@ public class LocalDispatchQueryFactory
                 queryMonitor,
                 clusterSizeMonitor,
                 executor,
-                // 查询【核心】
+                // 查询【核心】！！！
                 queryManager::createQuery);
     }
 }

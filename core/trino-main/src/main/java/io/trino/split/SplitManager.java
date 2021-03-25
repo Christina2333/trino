@@ -66,9 +66,18 @@ public class SplitManager
         splitManagers.remove(catalogName);
     }
 
+    /**
+     * 对数据进行分split todo todo 此处生成分布式执行计划时涉及到元数据分split
+     * @param session
+     * @param table
+     * @param splitSchedulingStrategy
+     * @param dynamicFilter
+     * @return
+     */
     public SplitSource getSplits(Session session, TableHandle table, SplitSchedulingStrategy splitSchedulingStrategy, DynamicFilter dynamicFilter)
     {
         CatalogName catalogName = table.getCatalogName();
+        // 获取指定数据源的ConnectorSplitManager
         ConnectorSplitManager splitManager = getConnectorSplitManager(catalogName);
 
         ConnectorSession connectorSession = session.toConnectorSession(catalogName);

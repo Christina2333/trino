@@ -112,6 +112,9 @@ import static io.trino.sql.tree.BooleanLiteral.TRUE_LITERAL;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
+/**
+ * 生成分布式执行计划，例如添加局部聚合和最终聚合
+ */
 public class AddExchanges
         implements PlanOptimizer
 {

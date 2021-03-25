@@ -180,8 +180,19 @@ class QueryPlanner
         this.recursiveSubqueries = recursiveSubqueries;
     }
 
+    /**
+     * 获取逻辑执行计划【核心】
+     * @param query 一个完整的sql
+     * @return
+     */
     public RelationPlan plan(Query query)
     {
+        /**
+         * RelationPlanner分析query.queryBody，最终调用
+         * @see io.trino.sql.tree.QuerySpecification.accept
+         * 最终调用
+         * @see QueryPlanner#plan(io.trino.sql.tree.QuerySpecification)
+         */
         PlanBuilder builder = planQueryBody(query);
 
         List<Expression> orderBy = analysis.getOrderByExpressions(query);
@@ -369,19 +380,29 @@ class QueryPlanner
         }, plan, null);
     }
 
+    /**
+     * 生成一个queryBody中所有的组件Node【核心】
+     * @param node
+     * @return
+     */
     public RelationPlan plan(QuerySpecification node)
     {
         PlanBuilder builder = planFrom(node);
 
+        // 生成filterNode
         builder = filter(builder, analysis.getWhere(node), node);
+        // 生成AggregateNode
         builder = aggregate(builder, node);
+        // 如果有Having则生成FilterNode
         builder = filter(builder, analysis.getHaving(node), node);
+        // 生成windowNode
         builder = window(node, builder, ImmutableList.copyOf(analysis.getWindowFunctions(node)));
 
         List<SelectExpression> selectExpressions = analysis.getSelectExpressions(node);
         List<Expression> expressions = selectExpressions.stream()
                 .map(SelectExpression::getExpression)
                 .collect(toImmutableList());
+        // 处理子查询
         builder = subqueryPlanner.handleSubqueries(builder, expressions, node);
 
         if (hasExpressionsToUnfold(selectExpressions)) {
@@ -572,6 +593,7 @@ class QueryPlanner
 
     private PlanBuilder planQueryBody(Query query)
     {
+        // 先取出query中的body
         RelationPlan relationPlan = new RelationPlanner(analysis, symbolAllocator, idAllocator, lambdaDeclarationToSymbolMap, metadata, outerContext, session, recursiveSubqueries)
                 .process(query.getQueryBody(), null);
 

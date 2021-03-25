@@ -109,6 +109,7 @@ import static java.util.Objects.requireNonNull;
  * gets rewritten as
  * <p/>
  * {@code Output[$2, $1] -> Project[$2, $1 := $3 * 100] -> Aggregate[$2, $3 := sum($4)] -> ...}
+ * 去除执行计划中projectNode无意义的映射，如果列直接相对而没有带表达式则直接映射到上层节点
  */
 public class UnaliasSymbolReferences
         implements PlanOptimizer

@@ -20,6 +20,9 @@ import io.trino.sql.planner.plan.PlanNodeId;
 
 import java.util.List;
 
+/**
+ * 执行source Task的调度器
+ */
 public interface SourceScheduler
 {
     ScheduleResult schedule();

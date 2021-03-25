@@ -120,6 +120,13 @@ public class JdbcMetadata
         return jdbcClient.getSystemTable(session, tableName);
     }
 
+    /**
+     * 谓词下推
+     * @param session
+     * @param table
+     * @param constraint
+     * @return
+     */
     @Override
     public Optional<ConstraintApplicationResult<ConnectorTableHandle>> applyFilter(ConnectorSession session, ConnectorTableHandle table, Constraint constraint)
     {

@@ -92,6 +92,9 @@ import static io.trino.sql.planner.plan.JoinNode.Type.RIGHT;
 import static io.trino.type.TypeUtils.NULL_HASH_CODE;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 提前进行哈希计算
+ */
 public class HashGenerationOptimizer
         implements PlanOptimizer
 {

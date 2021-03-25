@@ -52,6 +52,9 @@ import static io.trino.spi.connector.NotPartitionedPartitionHandle.NOT_PARTITION
 import static java.lang.Math.toIntExact;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 执行fixed任务的调度器
+ */
 public class FixedSourcePartitionedScheduler
         implements StageScheduler
 {

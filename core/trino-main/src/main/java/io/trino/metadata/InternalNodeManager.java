@@ -18,10 +18,24 @@ import io.trino.connector.CatalogName;
 import java.util.Set;
 import java.util.function.Consumer;
 
+/**
+ * node节点管理器
+ * 用于为执行stage分配节点时使用
+ */
 public interface InternalNodeManager
 {
+    /**
+     * 获取指定状态的节点列表
+     * @param state
+     * @return
+     */
     Set<InternalNode> getNodes(NodeState state);
 
+    /**
+     * 根据catalog获取节点列表
+     * @param catalogName
+     * @return
+     */
     Set<InternalNode> getActiveConnectorNodes(CatalogName catalogName);
 
     InternalNode getCurrentNode();
@@ -30,6 +44,9 @@ public interface InternalNodeManager
 
     AllNodes getAllNodes();
 
+    /**
+     * 刷新节点的信息
+     */
     void refreshNodes();
 
     void addNodeChangeListener(Consumer<AllNodes> listener);

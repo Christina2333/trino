@@ -26,6 +26,9 @@ import java.util.stream.IntStream;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 执行fixed任务的调度器
+ */
 public class FixedCountScheduler
         implements StageScheduler
 {

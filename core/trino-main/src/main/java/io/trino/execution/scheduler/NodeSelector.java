@@ -21,6 +21,9 @@ import io.trino.metadata.Split;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * 用于选择node执行stage
+ */
 public interface NodeSelector
 {
     void lockDownNodes();
@@ -29,6 +32,11 @@ public interface NodeSelector
 
     InternalNode selectCurrentNode();
 
+    /**
+     * 随机选择一个node节点，一般Single和Fixed Stage策略会这样选择
+     * @param limit
+     * @return
+     */
     default List<InternalNode> selectRandomNodes(int limit)
     {
         return selectRandomNodes(limit, ImmutableSet.of());

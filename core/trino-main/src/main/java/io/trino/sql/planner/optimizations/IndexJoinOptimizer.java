@@ -70,6 +70,9 @@ import static io.trino.sql.tree.BooleanLiteral.TRUE_LITERAL;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
 
+/**
+ * 将Join优化为IndexJoin，获取Join表的索引，提升速度
+ */
 public class IndexJoinOptimizer
         implements PlanOptimizer
 {

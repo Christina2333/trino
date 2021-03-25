@@ -114,6 +114,9 @@ import static io.trino.sql.tree.ComparisonExpression.Operator.LESS_THAN;
 import static io.trino.sql.tree.ComparisonExpression.Operator.LESS_THAN_OR_EQUAL;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * 谓词(过滤条件)下推，减下下层节点的数据量
+ */
 public class PredicatePushDown
         implements PlanOptimizer
 {

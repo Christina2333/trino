@@ -109,6 +109,7 @@ import static java.util.Objects.requireNonNull;
  * gets rewritten as
  * <p>
  * {@code Output[$0] -> Project[$0 := $1 + $2] -> ...}
+ * 去除ProjectNodeP不在最终输出中的列，减小计算量
  */
 public class PruneUnreferencedOutputs
         implements PlanOptimizer

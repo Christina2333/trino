@@ -59,6 +59,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Converts cardinality-insensitive aggregations (max, min, "distinct") over partition keys
  * into simple metadata queries
+ * 将对表的分区字段进行的聚合操作，改写为针对表元数据的查询，减少读取表的操作
  */
 public class MetadataQueryOptimizer
         implements PlanOptimizer

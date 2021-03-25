@@ -28,11 +28,27 @@ import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * stage的分布式执行计划
+ * 对task的调度都是基于stage进行调度的
+ */
 public class StageExecutionPlan
 {
+    /**
+     * 当前执行计划分段
+     */
     private final PlanFragment fragment;
+    /**
+     * 从SplitManager获取的分片映射关系
+     */
     private final Map<PlanNodeId, SplitSource> splitSources;
+    /**
+     * 子执行计划分段
+     */
     private final List<StageExecutionPlan> subStages;
+    /**
+     * 字段名称
+     */
     private final Optional<List<String>> fieldNames;
     private final Map<PlanNodeId, TableInfo> tables;
 

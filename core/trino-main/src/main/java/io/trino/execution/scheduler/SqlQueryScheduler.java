@@ -350,6 +350,7 @@ public class SqlQueryScheduler
 
         Set<SqlStageExecution> childStages;
         PartitioningHandle partitioningHandle = plan.getFragment().getPartitioning();
+        // 根据partitioningHandle的类型不同在stageSchedulers中放置stage调度器
         if (partitioningHandle.equals(SOURCE_DISTRIBUTION)) {
             // nodes are selected dynamically based on the constraints of the splits and the system load
             Entry<PlanNodeId, SplitSource> entry = Iterables.getOnlyElement(plan.getSplitSources().entrySet());

@@ -144,7 +144,7 @@ public class DistributedExecutionPlanner
         // create child stages
         ImmutableList.Builder<StageExecutionPlan> dependencies = ImmutableList.builder();
         for (SubPlan childPlan : root.getChildren()) {
-            // 将子逻辑执行计划全部转化为带用层级关系的stage执行计划，划分split
+            // 将子逻辑执行计划全部转化为带用层级关系的stage执行计划，划分split【会调用metadata划分split】
             dependencies.add(doPlan(childPlan, session, allSplitSources));
         }
 

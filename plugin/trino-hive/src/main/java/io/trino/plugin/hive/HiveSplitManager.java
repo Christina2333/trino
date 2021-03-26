@@ -222,6 +222,7 @@ public class HiveSplitManager
 
         // Only one thread per partition is usable when a table is not transactional
         int concurrency = isTransactionalTable(table.getParameters()) ? splitLoaderConcurrency : min(splitLoaderConcurrency, partitions.size());
+        // 把split放入异步队列中的组件
         HiveSplitLoader hiveSplitLoader = new BackgroundHiveSplitLoader(
                 table,
                 hiveTable.getTransaction(),
@@ -274,6 +275,7 @@ public class HiveSplitManager
             default:
                 throw new IllegalArgumentException("Unknown splitSchedulingStrategy: " + splitSchedulingStrategy);
         }
+        // 后台执行把split放入splitSource中的异步队列里
         hiveSplitLoader.start(splitSource);
 
         return splitSource;

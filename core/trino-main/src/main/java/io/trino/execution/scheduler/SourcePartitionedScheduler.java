@@ -229,6 +229,10 @@ public class SourcePartitionedScheduler
         whenFinishedOrNewLifespanAdded = SettableFuture.create();
     }
 
+    /**
+     * 负责头split的调度处理
+     * @return
+     */
     @Override
     public synchronized ScheduleResult schedule()
     {
@@ -244,6 +248,7 @@ public class SourcePartitionedScheduler
         for (Entry<Lifespan, ScheduleGroup> entry : scheduleGroups.entrySet()) {
             Lifespan lifespan = entry.getKey();
             ScheduleGroup scheduleGroup = entry.getValue();
+            // 等待分配placement的split
             Set<Split> pendingSplits = scheduleGroup.pendingSplits;
 
             if (scheduleGroup.state == ScheduleGroupState.NO_MORE_SPLITS || scheduleGroup.state == ScheduleGroupState.DONE) {
@@ -252,6 +257,7 @@ public class SourcePartitionedScheduler
             else if (pendingSplits.isEmpty()) {
                 // try to get the next batch
                 if (scheduleGroup.nextSplitBatchFuture == null) {
+                    // 获取split
                     scheduleGroup.nextSplitBatchFuture = splitSource.getNextBatch(scheduleGroup.partitionHandle, lifespan, splitBatchSize - pendingSplits.size());
 
                     long start = System.nanoTime();
@@ -475,6 +481,12 @@ public class SourcePartitionedScheduler
         return result.build();
     }
 
+    /**
+     * 为split分配placement
+     * @param splitAssignment
+     * @param noMoreSplitsNotification
+     * @return
+     */
     private Set<RemoteTask> assignSplits(Multimap<InternalNode, Split> splitAssignment, Multimap<InternalNode, Lifespan> noMoreSplitsNotification)
     {
         ImmutableSet.Builder<RemoteTask> newTasks = ImmutableSet.builder();

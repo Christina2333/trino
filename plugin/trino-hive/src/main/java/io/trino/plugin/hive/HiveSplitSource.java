@@ -72,10 +72,17 @@ class HiveSplitSource
     private final String queryId;
     private final String databaseName;
     private final String tableName;
+    /**
+     * 异步获取split文件的队列
+     */
     private final PerBucket queues;
     private final AtomicInteger bufferedInternalSplitCount = new AtomicInteger();
     private final long maxOutstandingSplitsBytes;
 
+    /**
+     * 每个split的size，默认64M
+     * 假如一个文件140M，会被切分为64M，64M，12M三个split
+     */
     private final DataSize maxSplitSize;
     private final DataSize maxInitialSplitSize;
     private final AtomicInteger remainingInitialSplits;
@@ -263,6 +270,11 @@ class HiveSplitSource
         return lastResult;
     }
 
+    /**
+     * 将split文件加入到内部队列中
+     * @param split
+     * @return
+     */
     ListenableFuture<?> addToQueue(InternalHiveSplit split)
     {
         if (stateReference.get().getKind() != INITIAL) {
@@ -311,6 +323,12 @@ class HiveSplitSource
         }
     }
 
+    /**
+     * 从队列中获取split进行消费
+     * @param partitionHandle
+     * @param maxSize
+     * @return
+     */
     @Override
     public CompletableFuture<ConnectorSplitBatch> getNextBatch(ConnectorPartitionHandle partitionHandle, int maxSize)
     {
@@ -487,10 +505,27 @@ class HiveSplitSource
         throw new TrinoException(HIVE_UNKNOWN_ERROR, throwable);
     }
 
+    /**
+     * 存储split的异步队列 -- 桶
+     */
     interface PerBucket
     {
+        /**
+         * split入队
+         * @param bucketNumber
+         * @param split
+         * @return
+         */
         ListenableFuture<?> offer(OptionalInt bucketNumber, InternalHiveSplit split);
 
+        /**
+         * 从队列中获取split
+         * @param bucketNumber 桶号
+         * @param maxSize     每个split的size
+         * @param function    处理函数
+         * @param <O>
+         * @return
+         */
         <O> ListenableFuture<O> borrowBatchAsync(OptionalInt bucketNumber, int maxSize, Function<List<InternalHiveSplit>, BorrowResult<InternalHiveSplit, O>> function);
 
         void finish();

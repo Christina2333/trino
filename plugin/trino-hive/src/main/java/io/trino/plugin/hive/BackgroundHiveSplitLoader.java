@@ -263,6 +263,7 @@ public class BackgroundHiveSplitLoader
                 }
                 taskExecutionLock.readLock().lock();
                 try {
+                    // 加入split
                     future = loadSplits();
                 }
                 catch (Throwable e) {
@@ -338,6 +339,7 @@ public class BackgroundHiveSplitLoader
         }
 
         while (splits.hasNext() && !stopped) {
+            // 将一个split添加到hiveSplitSource的异步队列中
             ListenableFuture<?> future = hiveSplitSource.addToQueue(splits.next());
             if (!future.isDone()) {
                 fileIterators.addFirst(splits);
